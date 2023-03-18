@@ -24,8 +24,8 @@ type Token struct {
 
 var token Token
 
-// ReadConfig reads the config file and unmarshals it into the config variable
-func ReadConfig() error {
+// readConfig reads the config file and unmarshals it into the config variable
+func readConfig() error {
 	fmt.Println("Reading config file...")
 	file, err := os.ReadFile("./config.yaml")
 	if err != nil {
@@ -42,7 +42,7 @@ func ReadConfig() error {
 	return nil
 }
 
-func Start() error {
+func start() error {
 	dg, err := discordgo.New("Bot " + token.Discord)
 	if err != nil {
 		log.Fatalf("failed to create Discord session: %v", err)
@@ -173,10 +173,10 @@ func JSONEscape(str string) string {
 }
 
 func main() {
-	err := ReadConfig()
+	err := readConfig()
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 
-	Start()
+	start()
 }
