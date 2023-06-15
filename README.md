@@ -1,2 +1,4 @@
-# chatgpt-opt
-Refer to https://gist.github.com/haoel/0d5440e953743a1b359300fff408311c
+# chatbot
+
+We will interact ChatGPT with the API with [Go client library](https://github.com/sashabaranov/go-openai)
+
