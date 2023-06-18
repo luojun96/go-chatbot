@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -38,18 +40,8 @@ func readConfig() error {
 	return nil
 }
 
-func interactGPT3(token string) {
-	client := openai.NewClient(token)
-	// resp, err := client.CreateCompletion(context.Background(),
-	// 	openai.CompletionRequest{
-	// 		Model:  openai.GPT3Davinci,
-	// 		Prompt: "This is a test",
-	// 	},
-	// )
-
-	// if err != nil {
-	// 	log.Fatalf("failed creating completion: %+v", err)
-	// }
+func interactGPT3(content string) (string, error) {
+	client := openai.NewClient(token.Chatgpt3)
 
 	resp, err := client.CreateChatCompletion(context.Background(),
 		openai.ChatCompletionRequest{
@@ -57,16 +49,17 @@ func interactGPT3(token string) {
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: "Horses are my favorite",
+					Content: content,
 				},
 			},
 		},
 	)
 	if err != nil {
 		log.Fatalf("failed creating chat completion: %+v", err)
+		return "", err
 	}
 
-	log.Printf("response: %+v", resp.Choices[0].Message.Content)
+	return resp.Choices[0].Message.Content, nil
 }
 
 func main() {
@@ -75,6 +68,21 @@ func main() {
 		log.Fatalf("failed reading config file: %+v", err)
 	}
 
-	// interact with GPT-3
-	interactGPT3(token.Chatgpt3)
+	fmt.Println("=======Welcome to GPT chatbot, type something to start:=======")
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("Human> ")
+	for scanner.Scan() {
+		input := scanner.Text()
+		if input == "exit" {
+			break
+		}
+		output, _ := interactGPT3(input)
+
+		fmt.Println("-------------------------------------------------------------")
+		fmt.Printf("Bot> %s\n", output)
+		fmt.Println("==============Type something to continue:====================")
+		fmt.Print("> ")
+	}
+
+	fmt.Printf("Bye!\n")
 }
