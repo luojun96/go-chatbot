@@ -66,6 +66,7 @@ func main() {
 	// read config file
 	if err := readConfig(); err != nil {
 		log.Fatalf("failed reading config file: %+v", err)
+		return
 	}
 
 	fmt.Println("=======Welcome to GPT chatbot, type something to start:=======")
