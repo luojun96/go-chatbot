@@ -12,17 +12,19 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
-// Token configure service token for GPT3
+// Token configure service token for GPT
 type Token struct {
 	Chatgpt3 string `yaml:"chatgpt3"`
 }
+
+const configPath = "./config.yaml"
 
 var token Token
 
 // read token from config file `config.yaml`
 func fetchToken() error {
 	log.Print("Start to fetch token from configure file.")
-	file, err := os.ReadFile("./config.yaml")
+	file, err := os.ReadFile(configPath)
 	if err != nil {
 		return fmt.Errorf("reading configure file failed: %v", err)
 	}
@@ -39,7 +41,7 @@ func fetchToken() error {
 	return nil
 }
 
-func interactGPT3(content string) (string, error) {
+func interactGPT(content string) (string, error) {
 	client := openai.NewClient(token.Chatgpt3)
 
 	resp, err := client.CreateChatCompletion(context.Background(),
@@ -74,7 +76,7 @@ func main() {
 		if input == "exit" {
 			break
 		}
-		output, _ := interactGPT3(input)
+		output, _ := interactGPT(input)
 
 		fmt.Println("-------------------------------------------------------------")
 		fmt.Printf("Bot> %s\n", output)
