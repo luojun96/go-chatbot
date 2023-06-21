@@ -12,6 +12,7 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+// Token configure service token for GPT3
 type Token struct {
 	Chatgpt3 string `yaml:"chatgpt3"`
 }
@@ -19,22 +20,20 @@ type Token struct {
 var token Token
 
 // read token from config file `config.yaml`
-func readConfig() error {
-	log.Print("Reading config file...")
+func fetchToken() error {
+	log.Print("Start to fetch token from configure file.")
 	file, err := os.ReadFile("./config.yaml")
 	if err != nil {
-		log.Fatalf("failed reading data from file: %+v", err)
-		return err
+		return fmt.Errorf("reading configure file failed: %v", err)
 	}
 
 	if err = yaml.Unmarshal(file, &token); err != nil {
-		log.Fatalf("failed unmarshaling data: %+v", err)
-		return err
+		return fmt.Errorf("unmarshaling token failed: %v", err)
 	}
 
-	log.Print("Reading config file success")
+	log.Print("Fetch token from configure file successfully.")
 	if token.Chatgpt3 == "" {
-		return errors.New("token is empty")
+		return errors.New("empty token")
 	}
 
 	return nil
@@ -63,10 +62,8 @@ func interactGPT3(content string) (string, error) {
 }
 
 func main() {
-	// read config file
-	if err := readConfig(); err != nil {
-		log.Fatalf("failed reading config file: %+v", err)
-		return
+	if err := fetchToken(); err != nil {
+		log.Fatalf("Reading configure file failed: %v", err)
 	}
 
 	fmt.Println("=======Welcome to GPT chatbot, type something to start:=======")
