@@ -1,2 +1,27 @@
-# chatgpt-opt
-Refer to https://gist.github.com/haoel/0d5440e953743a1b359300fff408311c
+# chatbot with chatgpt
+
+## introduction
+
+This is a simple chatbot based on chatgpt, currently we use `gpt-3.5-turbo` model. and we interacts ChatGPT with the API with [Go client library](https://github.com/sashabaranov/go-openai).
+
+## how to use
+
+### configure the token of OpenAI
+
+Fetch the token from your OpenAI account, and input it into `config.yaml` file like below:
+
+```yaml
+chatgpt3: "your token"
+```
+
+### start the chatbot
+
+Currently we need to run go program to interact with the API in this repoisitory directory.
+
+```bash
+go run .
+```
+
+and a simple demo of this chatbot with chatgpt is shown as below:
+
+![demo](resources/chatgpt-opt.png)
