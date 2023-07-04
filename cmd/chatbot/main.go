@@ -3,46 +3,24 @@ package main
 import (
 	"bufio"
 	"context"
-	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/luojun96/chatgpt-opt/conf"
 	openai "github.com/sashabaranov/go-openai"
-	yaml "gopkg.in/yaml.v3"
 )
 
-// Token configure service token for GPT
-type Token struct {
-	Chatgpt3 string `yaml:"chatgpt3"`
+func getEnvOrDefault(key, defaultValue string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return defaultValue
 }
 
-const configPath = "./config.yaml"
-
-var token Token
-
-// read token from config file `config.yaml`
-func fetchToken() error {
-	log.Print("Start to fetch token from configure file.")
-	file, err := os.ReadFile(configPath)
-	if err != nil {
-		return fmt.Errorf("reading configure file failed: %v", err)
-	}
-
-	if err = yaml.Unmarshal(file, &token); err != nil {
-		return fmt.Errorf("unmarshaling token failed: %v", err)
-	}
-
-	log.Print("Fetch token from configure file successfully.")
-	if token.Chatgpt3 == "" {
-		return errors.New("empty token")
-	}
-
-	return nil
-}
-
-func interactGPT(content string) (string, error) {
-	client := openai.NewClient(token.Chatgpt3)
+func interactGPT(content string, o *conf.OpenAI) (string, error) {
+	client := openai.NewClient(o.Token)
 
 	resp, err := client.CreateChatCompletion(context.Background(),
 		openai.ChatCompletionRequest{
@@ -64,8 +42,12 @@ func interactGPT(content string) (string, error) {
 }
 
 func main() {
-	if err := fetchToken(); err != nil {
-		log.Fatalf("Reading configure file failed: %v", err)
+	yamlFile := flag.String("f", getEnvOrDefault("CHATBOT_CONFIG", "config.yaml"), "configuration file")
+	flag.Parse()
+
+	c, err := conf.New(yamlFile)
+	if err != nil {
+		log.Fatalf("Reading the YAML configuration file failed: %v", err)
 	}
 
 	fmt.Println("=======Welcome to GPT chatbot, type something to start:=======")
@@ -76,7 +58,7 @@ func main() {
 		if input == "exit" {
 			break
 		}
-		output, _ := interactGPT(input)
+		output, _ := interactGPT(input, &c.OpenAI)
 
 		fmt.Println("-------------------------------------------------------------")
 		fmt.Printf("Bot> %s\n", output)
