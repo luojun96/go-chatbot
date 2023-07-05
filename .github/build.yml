@@ -1,0 +1,57 @@
+# This workflow will build a golang project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  GO_VERSION: "1.20"
+
+jobs:
+  lint:
+    name: Code Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go Environment
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+        id: go
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+      - name: "Give Permissions"
+        run: |
+          sudo chown -R root $GITHUB_WORKSPACE
+      - name: Spelling Check
+        uses: reviewdog/action-misspell@v1.12.3
+      - name: Revive Action
+        uses: morphy2k/revive-action@v2
+      - name: "Restore Permissions"
+        run: |
+          sudo chown -R $(id -u) $GITHUB_WORKSPACE
+      - name: Check formatting
+        run: test -z $(gofmt -l .) || (gofmt -l . && exit 1)
+
+
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go Environment
+      uses: actions/setup-go@v4
+      with:
+        go-version: ${{ .env.GO_VERSION }}
+
+    - name: Build
+      run: make build
+
+    - name: Test
+      run: make test
+      
