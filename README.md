@@ -39,7 +39,7 @@ You can run the chatbot by executing the following command:
 ./build/bin/chatbot -f config.yaml
 ```
 
-- `-f` configuration file. It also can be achived by setting the environment variable `CHATBOT_CONFIG`.
+- `-f` configuration file. It also can be achieved by setting the environment variable `CHATBOT_CONFIG`.
 
 ## Demo
 
